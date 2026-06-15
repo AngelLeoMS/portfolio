@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walmart Inventory Optimization</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        /* ── Tokens ── */
+        :root {
+            --bg:        #f5f0e8;
+            --surface:   #ffffff;
+            --ink:       #1a1614;
+            --ink2:      #4a4540;
+            --orange:    #e8622a;
+            --border:    2px solid #1a1614;
+            --border1:   1px solid #1a1614;
+            --font-sans: "Inter", -apple-system, sans-serif;
+            --font-mono: "Space Mono", monospace;
+            --max-w:     1500px;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-sans);
+            background: var(--bg);
+            color: var(--ink);
+            background-image:
+                linear-gradient(rgba(26,22,20,.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(26,22,20,.07) 1px, transparent 1px);
+            background-size: 44px 44px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page-wrap {
+            width: min(100% - 64px, var(--max-w));
+            margin: auto;
+        }
+
+        .narrow {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .project-hero {
+            padding: 140px 0 110px;
+        }
+        .project-hero .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        .project-hero-content {
+            width: 900px;
+            margin-left: 0;
+        }
+
+        .project-title {
+            font-size: clamp(68px, 6vw, 110px);
+            font-weight: 800;
+            line-height: 0.95;
+            letter-spacing: -0.05em;
+            color: var(--ink);
+            max-width: 1300px;
+            margin: 20px 0 28px;
+            text-wrap: balance;
+        }
+
+        .project-subtitle {
+            font-size: 22px;
+            line-height: 1.8;
+            max-width: 760px;
+            color: var(--ink2);
+        }
+
+        /* ── Navbar ── */
+        .navbar {
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(1.25rem, 4vw, 3rem);
+            height: 54px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .navbar .logo {
+            font-family: "Space Mono", monospace;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: 0.06em;
+        }
+        .navbar a:not(.logo) {
+            font-family: "Space Mono", monospace;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            line-height: 1.5;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        .navbar a:not(.logo):hover { color: #fff; }
+
+        /* ── Hero ── */
+        .hero {
+            background: #ffffff;
+            border-bottom: 1px solid rgba(0,0,0,0.12);
+            padding: 5rem clamp(1.25rem, 4vw, 3rem);
+        }
+        .hero-content {
+            max-width: 760px;
+            margin: 0 auto;
+        }
+        .back-link {
+            font-family: "Space Mono", monospace;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: #888;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            transition: color 0.15s ease;
+        }
+        .back-link:hover { color: #2a2a2a; }
+
+        /* ── Project tags ── */
+        .project-tags {
+            display: flex;
+            gap: 12px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+        .project-tags span {
+            border: var(--border1);
+            padding: 8px 16px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+        .project-tags span.featured {
+            background: var(--orange);
+            color: #fff;
+            border-color: var(--orange);
+        }
+
+        .hero h1 {
+            font-family: var(--font-sans);
+            font-size: clamp(36px, 6vw, 64px);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            color: var(--ink);
+            margin-bottom: 1.25rem;
+        }
+        .hero p {
+            font-size: 16px;
+            color: var(--ink2);
+            line-height: 1.75;
+            max-width: 560px;
+            margin-bottom: 1.75rem;
+        }
+        .skill-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .skill-tags span {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 5px 12px;
+            border: var(--border1);
+            color: var(--ink);
+            background: transparent;
+        }
+
+        /* ── Project banner ── */
+        .project-banner {
+            margin-bottom: 120px;
+            background: #0053E2;
+        }
+        .project-banner img {
+            width: 100%;
+            display: block;
+            border: none;
+        }
+
+        /* ── Walmart logo ── */
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px 0 70px;
+        }
+        .walmart-logo {
+            width: 420px;
+            max-width: 100%;
+            max-height: 280px;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+
+        /* ── Walmart Logo ── */
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 70px 0 90px;
+        }
+        .walmart-logo {
+            width: 420px;
+            height: auto;
+            display: block;
+        }
+
+        /* ── Project content ── */
+        .project-content section {
+            margin-bottom: 110px;
+        }
+        
+        .project-content h2 {
+            font-size: 52px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.05;
+            margin: 12px 0 30px;
+            color: var(--ink);
+        }
+        .project-content p {
+            font-size: 20px;
+            line-height: 1.8;
+            max-width: 780px;
+            color: var(--ink2);
+        }
+
+        /* Smaller type inside project-section blocks */
+        .project-section h2 {
+            font-size: 44px;
+            margin: 10px 0 22px;
+        }
+        .project-section p {
+            font-size: 18px;
+            line-height: 1.85;
+        }
+
+        /* ── Project sections ── */
+        .project-section {
+            margin-bottom: 60px;
+        }
+        .section-label {
+            color: var(--orange);
+            font-size: 12px;
+            letter-spacing: 3px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-title {
+            color: var(--orange);
+            font-size: 12px;
+            letter-spacing: 3px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ── Highlight box (results) ── */
+        .highlight-box {
+            border: var(--border);
+            background: white;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .highlight-box p {
+            max-width: 680px;
+        }
+
+        /* ── Gallery ── */
+        .gallery-section {
+            width: 100%;
+            padding-top: 120px;
+            padding-bottom: 160px;
+            background: #d8cfbc;
+            background-image:
+                linear-gradient(rgba(0,0,0,.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,.07) 1px, transparent 1px);
+            background-size: 44px 44px;
+        }
+
+        .project-content + .project-content {
+            padding-top: 120px;
+        }
+        .gallery-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 80px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+        .gallery-section h2 {
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            margin: 10px 0 20px;
+            color: var(--ink);
+        }
+        .gallery-intro {
+            max-width: 780px;
+            margin: 0 0 45px;
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--ink2);
+        }
+        .gallery-grid {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+        .gallery-item {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            overflow: hidden;
+        }
+        .gallery-card {
+            display: block;
+            text-decoration: none;
+            color: var(--ink);
+            border: 1px solid rgba(42,37,32,.15);
+            overflow: hidden;
+            transition: .35s ease;
+        }
+        .gallery-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 35px rgba(0,0,0,.08);
+            border-color: #ff5b2e;
+        }
+        .gallery-card img {
+            width: 100%;
+            display: block;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            background: #e8e4db;
+        }
+        .gallery-card span {
+            display: block;
+            padding: 10px 14px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--ink2);
+            border-top: 1px solid rgba(42,37,32,.1);
+            background: #faf8f4;
+        }
+        @media (max-width: 900px) {
+            .gallery-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ── Downloads ── */
+        .downloads {
+            display: flex;
+            flex-direction: column;
+        }
+        .downloads a {
+            display: flex;
+            justify-content: space-between;
+            padding: 24px 0;
+            border-bottom: var(--border1);
+            text-decoration: none;
+            color: var(--ink);
+            font-weight: 600;
+            font-size: 15px;
+            transition: padding-left .25s, color .25s;
+        }
+        .downloads a:first-child { border-top: var(--border1); }
+        .downloads a:hover { padding-left: 18px; color: var(--orange); }
+
+        /* ── Deliverables ── */
+        /* ── Deliverables grid ── */
+        .deliverables-grid {
+            margin-top: 50px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2px;
+            background: var(--border1);
+        }
+        .deliverable-card {
+            background: var(--surface);
+            border: none;
+            padding: 2rem;
+            text-decoration: none;
+            color: var(--ink);
+            display: flex;
+            flex-direction: column;
+            min-height: 260px;
+            position: relative;
+            transition: all .3s ease;
+        }
+        .deliverable-card:hover {
+            background: #75B887;
+            transform: translate(-6px, -6px);
+            box-shadow: 6px 6px 0 #111111;
+            z-index: 1;
+        }
+        .deliverable-card:hover .deliverable-card-arrow { color: var(--orange); }
+        .deliverable-icon {
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+        }
+        .deliverable-card h3 {
+            font-family: var(--font-sans);
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--ink);
+            margin-bottom: 10px;
+        }
+        .deliverable-card p {
+            font-size: 14px;
+            color: var(--ink2);
+            line-height: 1.75;
+            flex: 1;
+        }
+        .deliverable-card span {
+            margin-top: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--ink2);
+            transition: color .2s;
+        }
+        .deliverable-card:hover span,
+        .deliverable-card:hover h3,
+        .deliverable-card:hover p { color: var(--ink); }
+
+        /* ── Tools ── */
+        .tools {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+        .tools span {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--ink);
+            background: var(--surface);
+            border: 2px solid var(--ink);
+            padding: 10px 20px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .tools span:hover {
+            background: var(--ink);
+            color: var(--surface);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 860px) {
+            .content { width: 100%; padding: 60px clamp(1.25rem, 4vw, 2.5rem); }
+            .hero { padding: 3.5rem clamp(1.25rem, 4vw, 2.5rem); }
+            .content h2 { font-size: 36px; }
+        }
+        @media (max-width: 520px) {
+            .hero h1 { font-size: 32px; }
+            .content h2 { font-size: 28px; }
+            .results { padding: 28px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="../index.html" class="logo">AM</a>
+    <a href="../index.html">HOME</a>
+</header>
+
+<section class="hero project-hero">
+    <div class="container page-wrap">
+        <div class="project-hero-content">
+        <a href="../index.html" class="back-link">← BACK</a>
+        <div class="project-tags">
+            <span>SUPPLY CHAIN</span>
+            <span class="featured">FEATURED</span>
+        </div>
+        <h1 class="project-title">Walmart Operations Analytics</h1>
+        <p class="project-subtitle">Analysis of store operations and how Nil Picks impact performance.</p>
+        <div class="skill-tags">
+            <span>EXCEL</span>
+            <span>POWER BI</span>
+            <span>DATA ANALYTICS</span>
+        </div>
+        </div>
+    </div>
+</section>
+
+<section class="project-banner">
+    <div class="page-wrap">
+        <div class="logo-container">
+            <img src="data:image/png;base64,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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/2Q==" alt="Walmart Logo" class="walmart-logo">
+        </div>
+    </div>
+</section>
+
+<main class="project-content page-wrap narrow">
+
+    <!-- PROBLEM -->
+    <div class="project-section" style="max-width:760px;margin-left:auto;margin-right:auto;">
+        <span class="section-label">/ PROBLEM</span>
+        <h2>What needed solving</h2>
+        <p>High NIL Pick (Not-In-Location Pick) activity reduces fulfillment efficiency and indicates underlying inventory management issues. This project investigates the operational impact that NIL Picks have using real Walmart store data.</p>
+    </div>
+
+    <!-- DATASET -->
+    <div class="project-section" style="max-width:760px;margin-left:auto;margin-right:auto;">
+        <span class="section-label">/ DATASET</span>
+        <h2>The data</h2>
+        <p>Data was collected from Walmart's <strong>MyWalmart</strong> application, including fulfillment KPIs, freight activity, inventory metrics, NIL Picks, and Out Scans. The data was consolidated and prepared for analysis in Excel.</p>
+    </div>
+
+    <!-- APPROACH -->
+    <div class="project-section" style="max-width:760px;margin-left:auto;margin-right:auto;">
+        <span class="section-label">/ APPROACH</span>
+        <h2>How I tackled it</h2>
+        <p>I cleaned and organized the data in Excel, developed KPI calculations and Pivot Tables, and built an interactive Power BI dashboard to analyze operational performance and identify improvement opportunities.</p>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="project-section highlight-box">
+        <span class="section-label">/ RESULTS</span>
+        <h2>What came out of it</h2>
+        <p>The analysis highlights operational trends affecting fulfillment performance and provides recommendations to improve inventory execution, freight prioritization, and overall store efficiency.</p>
+    </div>
+
+</main>
+
+<!-- GALLERY -->
+    <section class="gallery-section" id="gallery">
+        <div class="gallery-container">
+            <span class="section-label">/ GALLERY</span>
+            <h2>Project Dashboard</h2>
+            <p class="gallery-intro">Dashboard views highlighting operational KPIs, department performance, and trends used throughout the analysis.</p>
+            <div class="gallery-grid">
+            <a href="images/kpi-overview.png" target="_blank" class="gallery-card">
+                <img src="images/kpi-overview.png" alt="KPI Overview">
+                <span>KPI Overview</span>
+            </a>
+            <a href="images/department-performance.png" target="_blank" class="gallery-card">
+                <img src="images/department-performance.png" alt="Department Performance">
+                <span>Department Performance</span>
+            </a>
+            <a href="images/sales-ftp-trends.png" target="_blank" class="gallery-card">
+                <img src="images/sales-ftp-trends.png" alt="Sales &amp; FTP Trends">
+                <span>Sales &amp; FTP Trends</span>
+            </a>
+            <a href="images/freight-cases.png" target="_blank" class="gallery-card">
+                <img src="images/freight-cases.png" alt="Freight Cases">
+                <span>Freight Cases</span>
+            </a>
+            <a href="images/freight-completion.png" target="_blank" class="gallery-card">
+                <img src="images/freight-completion.png" alt="Freight Completion">
+                <span>Freight Completion</span>
+            </a>
+        </div>
+    </section>
+
+<section class="project-content page-wrap narrow" style="padding-top: 120px;">
+
+    <section class="project-section">
+        <span class="section-label">/ DELIVERABLES</span>
+        <h2>Project Deliverables</h2>
+        <div class="deliverables-grid">
+            <!-- REPORT -->
+            <a href="files/Walmart Operational Analytics Project Report Angel Molina.docx" class="deliverable-card">
+                <div class="deliverable-icon">📄</div>
+                <h3>Report</h3>
+                <p>Project report documenting the analysis, findings, and recommendations.</p>
+                <span>Open Document →</span>
+            </a>
+            <a href="files/Walmart Operations Analytics Angel Molina.xlsx" class="deliverable-card">
+                <div class="deliverable-icon">📊</div>
+                <h3>Excel Analysis</h3>
+                <p>Cleaned dataset, Pivot Tables, KPI calculations, and operational analysis.</p>
+                <span>Open Workbook →</span>
+            </a>
+            <a href="files/Walmart OPD Dashboard Angel Molina.pbix" class="deliverable-card">
+                <div class="deliverable-icon">📈</div>
+                <h3>Power BI Dashboard</h3>
+                <p>Interactive dashboard highlighting NIL Pick trends and operational performance.</p>
+                <span>Download Dashboard →</span>
+            </a>
+        </div>
+    </section>
+
+    <section>
+        <span class="section-title">/ TOOLS USED</span>
+        <div class="tools">
+            <span>Microsoft Excel</span>
+            <span>Power BI</span>
+            <span>MyWalmart App</span>
+        </div>
+    </section>
+
+</section>
+
+</body>
+</html>
