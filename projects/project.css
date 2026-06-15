@@ -41,3 +41,17 @@
     letter-spacing:.08em;
     text-transform:uppercase;
 }
+/* ── Results highlight box ── */
+.highlight-box {
+    border: 2px solid #1a1614;
+    background: white;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.highlight-box p {
+    max-width: 680px;
+}
