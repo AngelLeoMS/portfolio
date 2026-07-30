@@ -1,4 +1,5 @@
--- Data Cleaning Project
+-- Data Cleaning Project where I took a world's layoffs dataset and cleaned it.
+
 -- Skills used: Window functions, CTEs, JOINS, Data standardization.
 
 SELECT *
