@@ -1,6 +1,7 @@
 -- Exploratory Data Analysis
 
--- Tools used: 
+-- Tools used: Aggregate functions, window functions, CTEs, GROUP BY
+
 SELECT *
 FROM layoffs_staging2;
 
